@@ -5,9 +5,25 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // Updated theme name in comments
+        // 8 Lines theme colors
+        gold: '#D4AF37',
+        'gold-light': '#E5C158',
+        dark: {
+          DEFAULT: '#121212',
+          lighter: '#1E1E1E',
+          darker: '#0A0A0A',
+        },
+        border: '#333333',
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+      },
+    },
   },
-  plugins: [require('daisyui'),],
+  plugins: [require('daisyui'),require('@tailwindcss/forms'),],
   daisyui: {
     themes: [
       {
