@@ -1,4 +1,3 @@
-
 // src/routes/AppRouter.jsx
 import {
   createBrowserRouter,
@@ -15,47 +14,44 @@ import BookDetail from "../pages/BookDetail"; // Import the BookDetail component
 import { Book, LayoutDashboard, ShoppingCart, Users } from "lucide-react";
 import UserPersonalInfo from "../pages/UserPersonalInfo";
 
-// Create a BookList component if it doesn't exist
-const BookListPage = () => {
-  return <BookList />;
-};
+// Import Admin Components
+import { BookManagement } from "../components/Admin/BookManagement";
+import { OrderManagement } from "../components/Admin/OrderManagement";
 
-// Define routes with their metadata for sidebar navigation
-import {BookManagement} from "../components/Admin/BookManagement";
-import {OrderManagement} from "../components/Admin/OrderManagement";
-
+// Define admin routes with metadata for sidebar navigation
 const adminRoutes = [
-  { 
-    path: "/", 
+  {
+    path: "/",
     element: <p>Dashboard</p>,
     name: "Dashboard",
-    icon: <LayoutDashboard size={18} />
+    icon: <LayoutDashboard size={18} />,
   },
-  { 
-    path: "/dashboard", 
+  {
+    path: "/dashboard",
     element: <p>Dashboard</p>,
     name: "Dashboard",
-    icon: <LayoutDashboard size={18} />
+    icon: <LayoutDashboard size={18} />,
   },
-  { 
-    path: "/orders", 
+  {
+    path: "/orders",
     element: <OrderManagement />, // Add OrderManagement component here
     name: "Orders",
-    icon: <ShoppingCart size={18} />
+    icon: <ShoppingCart size={18} />,
   },
-  { 
-    path: "/books", 
+  {
+    path: "/books",
     element: <BookManagement />, // Add BookManagement component here
     name: "Books",
-    icon: <Book size={18} />
+    icon: <Book size={18} />,
   },
-  { 
-    path: "/users", 
+  {
+    path: "/users",
     element: <p>Users Management</p>,
     name: "Users",
-    icon: <Users size={18} />
-  }
+    icon: <Users size={18} />,
+  },
 ];
+
 // Guest router - for unauthenticated users
 const guestRouter = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -72,7 +68,7 @@ const userRouter = createBrowserRouter([
       { index: true, element: <BookList /> },
       { path: "/books", element: <BookList /> },
       { path: "/book/:id", element: <BookDetail /> },
-      { path: "/me",  element: <UserPersonalInfo/> },
+      { path: "/me", element: <UserPersonalInfo /> },
       { path: "*", element: <Navigate to="/" /> },
     ],
   },
@@ -83,13 +79,15 @@ const adminRouter = createBrowserRouter([
   {
     path: "/",
     element: <AppAdmin />,
-    children: adminRoutes.map(route => ({
-      path: route.path === "/" ? "" : route.path.replace(/^\//, ""),
-      element: route.element
-    })).concat([
-      { path: "books/:id", element: <BookDetail /> }, // Book detail route for admin
-      { path: "*", element: <Navigate to="/" /> }
-    ]),
+    children: adminRoutes
+      .map((route) => ({
+        path: route.path === "/" ? "" : route.path.replace(/^\//, ""),
+        element: route.element,
+      }))
+      .concat([
+        { path: "books/:id", element: <BookDetail /> }, // Book detail route for admin
+        { path: "*", element: <Navigate to="/" /> },
+      ]),
   },
 ]);
 
@@ -98,10 +96,13 @@ export const getAdminRoutes = () => adminRoutes;
 
 export default function AppRouter() {
   const user = useUserStore((state) => state.user);
+
+  // Determine which router to use based on user role
   const finalRouter = user
     ? user.role === "ADMIN"
       ? adminRouter
       : userRouter
     : guestRouter;
+
   return <RouterProvider key={user?.id} router={finalRouter} />;
 }
