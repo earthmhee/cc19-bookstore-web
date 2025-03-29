@@ -1,65 +1,3 @@
-// import {
-//   createBrowserRouter,
-//   Navigate,
-//   RouterProvider,
-// } from "react-router";
-// import App from "../App";
-// import Login from "../pages/Login";
-// import useUserStore from "../stores/userStore";
-// import ProtectedRoute from "./ProtectedRoute";
-// import LayoutAdmin from "../layout/LayoutAdmin";
-// import Admin from "../components/Admin";
-// import AppAdmin from "../AppAdmin";
-
-// const guestRouter = createBrowserRouter([
-//   { path: "/", element: <Login /> },
-//   { path: "*", element: <Navigate to="/" /> },
-// ]);
-
-// const userRouter = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: (
-//       // <ProtectedRoute>
-//         <App />
-//       // </ProtectedRoute>
-//     ),
-//     children: [
-//       { index: true, element: <p>Sidebar + Post</p> },
-//       { path: "/books", element: <p>Books Page</p> },
-//       { path: "/me", element: <p>Personal user data</p> },
-//       { path: "*", element: <Navigate to="/" /> },
-//     ],
-//   },
-// ]);
-
-// const adminRouter = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: (
-//       // <ProtectedRoute>
-//         <AppAdmin />
-//       // </ProtectedRoute>
-//     ),
-//     children: [
-//       { index: true, element: <p>Dashboard</p> },
-//       { path: "/dashboard", element: <p>Dashboard</p> },
-//       { path: "/manage", element: <p>Manage</p> },
-//       { path: "/transaction", element: <p>Transaction</p> },
-//       { path: "*", element: <Navigate to="/" /> },
-//     ],
-//   },
-// ]);
-
-// export default function AppRouter() {
-//   const user = useUserStore((state) => state.user);
-//   const finalRouter = user
-//     ? user.role === "ADMIN"
-//       ? adminRouter
-//       : userRouter
-//     : guestRouter;
-//   return <RouterProvider key={user?.id} router={finalRouter} />;
-// }
 
 // src/routes/AppRouter.jsx
 import {
@@ -83,6 +21,9 @@ const BookListPage = () => {
 };
 
 // Define routes with their metadata for sidebar navigation
+import {BookManagement} from "../components/Admin/BookManagement";
+import {OrderManagement} from "../components/Admin/OrderManagement";
+
 const adminRoutes = [
   { 
     path: "/", 
@@ -98,13 +39,13 @@ const adminRoutes = [
   },
   { 
     path: "/orders", 
-    element: <p>Orders Management</p>,
+    element: <OrderManagement />, // Add OrderManagement component here
     name: "Orders",
     icon: <ShoppingCart size={18} />
   },
   { 
     path: "/books", 
-    element: <p>Books Management</p>,
+    element: <BookManagement />, // Add BookManagement component here
     name: "Books",
     icon: <Book size={18} />
   },
@@ -115,7 +56,6 @@ const adminRoutes = [
     icon: <Users size={18} />
   }
 ];
-
 // Guest router - for unauthenticated users
 const guestRouter = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -147,7 +87,7 @@ const adminRouter = createBrowserRouter([
       path: route.path === "/" ? "" : route.path.replace(/^\//, ""),
       element: route.element
     })).concat([
-      { path: "books/:id", element: <BookDetail /> }, // Add book detail route for admin
+      { path: "books/:id", element: <BookDetail /> }, // Book detail route for admin
       { path: "*", element: <Navigate to="/" /> }
     ]),
   },
@@ -158,13 +98,10 @@ export const getAdminRoutes = () => adminRoutes;
 
 export default function AppRouter() {
   const user = useUserStore((state) => state.user);
-  
-  // Determine which router to use based on user role
   const finalRouter = user
     ? user.role === "ADMIN"
       ? adminRouter
       : userRouter
     : guestRouter;
-    
   return <RouterProvider key={user?.id} router={finalRouter} />;
 }
