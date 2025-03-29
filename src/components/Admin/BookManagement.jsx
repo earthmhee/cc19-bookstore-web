@@ -14,7 +14,7 @@ export const BookManagement = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/admin/books', {
+      const response = await axios.get('http://localhost:8050/admin/books', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -37,14 +37,14 @@ export const BookManagement = () => {
 
     try {
       if (editingBook) {
-        await axios.patch(`http://localhost:8000/admin/books/${editingBook.id}`, formData, {
+        await axios.patch(`http://localhost:8050/admin/books/${editingBook.id}`, formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       } else {
-        await axios.post('http://localhost:8000/admin/books', formData, {
+        await axios.post('http://localhost:8050/admin/books', formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
@@ -70,7 +70,7 @@ export const BookManagement = () => {
 
   const handleAdjustStock = async (bookId, newStock) => {
     try {
-      await axios.patch(`http://localhost:8000/admin/books/${bookId}/stock`, 
+      await axios.patch(`http://localhost:8050/admin/books/${bookId}/stock`, 
         { stock: newStock },
         {
           headers: {
