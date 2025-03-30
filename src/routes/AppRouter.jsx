@@ -17,6 +17,9 @@ import UserPersonalInfo from "../pages/UserPersonalInfo";
 // Import Admin Components
 import { BookManagement } from "../components/Admin/BookManagement";
 import { OrderManagement } from "../components/Admin/OrderManagement";
+import Checkout from "../pages/Checkout";
+import Orders from "../pages/Orders";
+import Cart from "../pages/Cart";
 
 // Define admin routes with metadata for sidebar navigation
 const adminRoutes = [
@@ -68,6 +71,9 @@ const userRouter = createBrowserRouter([
       { index: true, element: <BookList /> },
       { path: "/books", element: <BookList /> },
       { path: "/book/:id", element: <BookDetail /> },
+      { path: "/checkout", element: <Checkout /> },
+      { path: "/orders", element: <Orders /> },
+      { path: "/cart", element: <Cart /> },
       { path: "/me", element: <UserPersonalInfo /> },
       { path: "*", element: <Navigate to="/" /> },
     ],

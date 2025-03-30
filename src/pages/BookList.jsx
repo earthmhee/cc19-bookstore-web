@@ -1,18 +1,25 @@
-// src/pages/BookList.jsx (modified to use cart store)
-import React, { useState, useEffect } from "react";
+// src/pages/BookList.jsx
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ShoppingCart, X, ChevronLeft, ChevronRight } from "lucide-react";
 import useUserStore from "../stores/userStore";
-import useCartStore from "../stores/cartStore"; // ADDED: Import cart store
+import useCartStore from "../stores/cartStore";
 import { getAllBooks } from "../api/books";
-
+// Import Swiper components and styles
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import '../styles/starBackground.css';
 function BookList() {
+  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const token = useUserStore((state) => state.token);
   
-  // MODIFIED: Use cart store instead of local state
+  // Use cart store
   const cart = useCartStore((state) => state.cart);
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
@@ -30,6 +37,81 @@ function BookList() {
     fetchBook(token);
   }, [token]);
 
+  // Ref for stars container
+  const starsContainerRef = useRef(null);
+
+  useEffect(() => {
+    fetchBook(token);
+    
+    // Initialize starry background
+    initStars();
+  }, [token]);
+  
+  // Initialize stars
+  const initStars = () => {
+    const container = starsContainerRef.current;
+    if (!container) return;
+    
+    // Clear any existing stars
+    container.innerHTML = '';
+    
+    // Create stars
+    const starCount = 150;
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      
+      // Random position
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      
+      // Random size (1-4px)
+      const size = Math.random() * 3 + 1;
+      
+      // Random duration (3-8s)
+      const duration = Math.random() * 5 + 3;
+      
+      // Random opacity (0.1-0.7)
+      const opacity = Math.random() * 0.6 + 0.1;
+      
+      // Apply styles
+      star.style.left = `${x}%`;
+      star.style.top = `${y}%`;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.setProperty('--duration', `${duration}s`);
+      star.style.setProperty('--opacity', opacity);
+      
+      // Add delay
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      
+      // Add to container
+      container.appendChild(star);
+    }
+    
+    // Create a few larger, brighter stars
+    for (let i = 0; i < 15; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      const size = Math.random() * 4 + 4; // 4-8px
+      const duration = Math.random() * 6 + 4;
+      const opacity = Math.random() * 0.3 + 0.7; // 0.7-1.0
+      
+      star.style.left = `${x}%`;
+      star.style.top = `${y}%`;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.setProperty('--duration', `${duration}s`);
+      star.style.setProperty('--opacity', opacity);
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      star.style.boxShadow = `0 0 ${size * 2}px rgba(255, 255, 255, 0.8)`;
+      
+      container.appendChild(star);
+    }
+  };
   useEffect(() => {
     // Calculate total pages whenever books array changes
     setTotalPages(Math.ceil(books.length / booksPerPage));
@@ -328,35 +410,85 @@ function BookList() {
   };
 
   return (
-    <div className="bg-gray-800 min-h-screen text-white">
-      {/* <header className="p-4 bg-gray-900 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-yellow-500">Bookstore</h1>
-        <button
-          className="relative text-gray-400 hover:text-white"
-          onClick={() => setIsCartOpen(true)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
-          {getTotalItems() > 0 && (
-            <span className="absolute -top-2 -right-2 bg-yellow-600 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-              {getTotalItems()}
-            </span>
-          )}
-        </button>
-      </header> */}
-      <main className="p-4">
+    <div className="bg-gray-800 min-h-screen text-white relative">
+      {/* Starry Background */}
+      <div className="stars-container" ref={starsContainerRef}></div>
+      
+      <main className="p-4 relative z-10">
+        {/* Featured Books Slider */}
+        <div className="mb-16 mt-6">
+          <h2 className="text-3xl font-bold text-yellow-500 mb-8 text-center">Featured Books</h2>
+          
+          <div className="max-w-7xl mx-auto px-4">
+            <Swiper
+              modules={[Pagination, Navigation, Autoplay]}
+              spaceBetween={30}
+              slidesPerView={1}
+              navigation={{
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+              }}
+              pagination={{ 
+                clickable: true,
+                el: '.swiper-pagination'
+              }}
+              autoplay={{ 
+                delay: 4000, 
+                disableOnInteraction: false 
+              }}
+              className="featured-swiper"
+              breakpoints={{
+                640: { slidesPerView: 2, spaceBetween: 20 },
+                768: { slidesPerView: 3, spaceBetween: 30 },
+                1024: { slidesPerView: 4, spaceBetween: 30 },
+              }}
+            >
+              {books.slice(0, 8).map((book) => (
+                <SwiperSlide key={`featured-${book.id}`} className="py-4 px-2">
+                  <div 
+                    className="bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden cursor-pointer hover:border-yellow-600 hover:shadow-2xl transition-all h-full flex flex-col transform hover:-translate-y-2 duration-300"
+                    onClick={() => openBookDetail(book)}
+                  >
+                    <div className="h-56 overflow-hidden">
+                      <img
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        src={book.urlImage}
+                        alt={book.title}
+                      />
+                    </div>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h2 className="text-xl font-bold text-white mb-2 line-clamp-1">{book.title}</h2>
+                      <p className="text-gray-400 mb-3">{book.author}</p>
+                      <p className="text-yellow-500 font-bold text-lg mt-auto mb-4">
+                        ${book.price.toFixed(2)}
+                      </p>
+                      <button
+                        className="mt-auto bg-yellow-600 text-black py-3 px-4 rounded-lg hover:bg-yellow-500 transition-colors w-full font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent opening modal when clicking the button
+                          addToCart(book);
+                        }}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            
+            {/* Custom navigation buttons */}
+            <div className="flex justify-between mt-4">
+              <div className="swiper-button-prev !relative !top-0 !left-0 !mt-0 !w-10 !h-10 bg-gray-900 bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-gray-700 transition-colors after:!text-lg"></div>
+              <div className="swiper-pagination !relative !bottom-0"></div>
+              <div className="swiper-button-next !relative !top-0 !right-0 !mt-0 !w-10 !h-10 bg-gray-900 bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-gray-700 transition-colors after:!text-lg"></div>
+            </div>
+          </div>
+          
+          <div className="border-b border-gray-700 w-full my-16"></div>
+        </div>
+
+        {/* Regular book grid */}
         <div className="flex flex-wrap -mx-4">
           {currentBooks.map((book) => (
             <BookCard key={book.id} book={book} />
@@ -369,12 +501,15 @@ function BookList() {
           Showing {indexOfFirstBook + 1}-{Math.min(indexOfLastBook, books.length)} of {books.length} books
         </div>
       </main>
+      
       <Cart />
+      
       <BookDetailModal 
         book={selectedBook} 
         isOpen={isModalOpen} 
         onClose={closeBookDetail} 
       />
+      
     </div>
   );
 }
